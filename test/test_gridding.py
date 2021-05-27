@@ -27,4 +27,3 @@ class TestGridding(unittest.TestCase):
         x = torch.rand(1, 64, 3)
         x.requires_grad = True
         self.assertTrue(gradcheck(GriddingFunction.apply, [x.double().cuda(), 8]))
-

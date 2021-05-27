@@ -2,6 +2,7 @@
 #include "chamfer_dist.h"
 #include "cubic_feature_sampling.h"
 #include "gridding.h"
+#include "gridding_reverse.h"
 #include "interpolate.h"
 #include "metrics.h"
 #include "sampling.h"
@@ -27,4 +28,7 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m)
 
     m.def("gridding", &gridding);
     m.def("gridding_grad", &gridding_grad);
+
+    m.def("gridding_reverse", &gridding_reverse);
+    m.def("gridding_reverse_grad", &gridding_reverse_grad);
 }

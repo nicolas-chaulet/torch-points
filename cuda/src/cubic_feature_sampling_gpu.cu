@@ -7,17 +7,11 @@
 
 #define CUDA_NUM_THREADS 512
 
-// Computer the number of threads needed in GPU
-inline int get_n_threads(int n)
-{
-    const int pow_2 = std::log(static_cast<float>(n)) / std::log(2.0);
-    return max(min(1 << pow_2, CUDA_NUM_THREADS), 1);
-}
-
 __device__ int compute_index(int offset_x, int offset_y, int offset_z, int scale)
 {
     return offset_x * scale * scale + offset_y * scale + offset_z;
 }
+
 
 template <typename scalar_t>
 __global__ void cubic_feature_sampling_kernel(int scale, int neighborhood_size, int n_vertices,
@@ -120,7 +114,7 @@ std::vector<torch::Tensor> cubic_feature_sampling_kernel_wrapper(int scale, int 
 
     AT_DISPATCH_FLOATING_TYPES(
         ptcloud.scalar_type(), "cubic_feature_sampling_cuda", ([&] {
-            cubic_feature_sampling_kernel<<<batch_size, get_n_threads(n_pts), 0, stream>>>(
+            cubic_feature_sampling_kernel<<<batch_size, opt_n_threads(n_pts), 0, stream>>>(
                 scale, neighborhood_size, n_vertices, n_pts, n_cubic_channels,
                 ptcloud.data_ptr<scalar_t>(), cubic_features.data_ptr<scalar_t>(),
                 point_features.data_ptr<scalar_t>(), grid_pt_indexes.data_ptr<int>());
@@ -194,7 +188,7 @@ cubic_feature_sampling_grad_kernel_wrapper(int scale, int neighborhood_size,
 
     AT_DISPATCH_FLOATING_TYPES(
         grad_point_features.scalar_type(), "cubic_feature_sampling_grad_cuda", ([&] {
-            cubic_feature_sampling_grad_kernel<<<batch_size, get_n_threads(n_pts), 0, stream>>>(
+            cubic_feature_sampling_grad_kernel<<<batch_size, opt_n_threads(n_pts), 0, stream>>>(
                 scale, neighborhood_size, n_vertices, n_pts, n_cubic_channels,
                 grad_point_features.data_ptr<scalar_t>(), grid_pt_indexes.data_ptr<int>(),
                 grad_ptcloud.data_ptr<scalar_t>(), grad_cubic_features.data_ptr<scalar_t>());

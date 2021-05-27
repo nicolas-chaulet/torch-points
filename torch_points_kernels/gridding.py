@@ -8,7 +8,7 @@ class GriddingFunction(torch.autograd.Function):
     @staticmethod
     def forward(ctx, ptcloud, scale):
         if not torch.cuda.is_available():
-            raise NotImplementedError("CPU version is not available for Chamfer Distance")
+            raise NotImplementedError("CPU version is not available for Gridding")
 
         grid, grid_pt_weights, grid_pt_indexes = tpcuda.gridding(
             -scale, scale - 1, -scale, scale - 1, -scale, scale - 1, ptcloud
